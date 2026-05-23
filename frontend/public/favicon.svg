@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Gradients -->
+  <defs>
+    <radialGradient id="bg-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="shield-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="silver-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle (Outer Glow) -->
+  <circle cx="256" cy="256" r="240" fill="url(#bg-grad)" stroke="url(#gold-grad)" stroke-width="8"/>
+
+  <!-- Crossed Swords (RPG Element) -->
+  <!-- Sword 1 (Top-Left to Bottom-Right) -->
+  <path d="M90 90 L220 220 L200 240 L70 110 Z" fill="url(#silver-grad)"/>
+  <path d="M70 110 L50 130 L100 180 L120 160 Z" fill="url(#gold-grad)"/> <!-- Guard -->
+  <path d="M50 130 L30 150 L50 170 L70 150 Z" fill="#7f1d1d"/> <!-- Hilt -->
+  
+  <!-- Sword 2 (Top-Right to Bottom-Left) -->
+  <path d="M422 90 L292 220 L312 240 L442 110 Z" fill="url(#silver-grad)"/>
+  <path d="M442 110 L462 130 L412 180 L392 160 Z" fill="url(#gold-grad)"/> <!-- Guard -->
+  <path d="M462 130 L482 150 L462 170 L442 150 Z" fill="#7f1d1d"/> <!-- Hilt -->
+
+  <!-- Shield (RPG & Security) -->
+  <path d="M156 160 C156 160 256 120 256 120 C256 120 356 160 356 160 C356 280 256 380 256 380 C256 380 156 280 156 160 Z" 
+        fill="url(#shield-grad)" stroke="url(#gold-grad)" stroke-width="12" stroke-linejoin="round"/>
+
+  <!-- Gold Coin in the Center (POS / Transaction Element) -->
+  <circle cx="256" cy="240" r="55" fill="url(#gold-grad)" stroke="#fff" stroke-width="4"/>
+  
+  <!-- Dollar Sign on Coin -->
+  <text x="256" y="262" font-family="system-ui, -apple-system, sans-serif" font-size="65" font-weight="900" fill="#7f1d1d" text-anchor="middle">$</text>
+
+  <!-- Stars Decoration -->
+  <polygon points="256,50 262,70 282,70 266,82 272,102 256,90 240,102 246,82 230,70 250,70" fill="url(#gold-grad)"/>
+</svg>
