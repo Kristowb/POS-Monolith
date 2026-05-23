@@ -2,6 +2,7 @@ package com.app.service;
 
 import com.app.config.JwtService;
 import com.app.dto.AuthResponse;
+import com.app.dto.GoogleLoginRequest;
 import com.app.dto.LoginRequest;
 import com.app.dto.RegisterRequest;
 import com.app.dto.UserResponse;
@@ -10,6 +11,7 @@ import com.app.model.UserEntity;
 import com.app.repository.InvalidatedTokenRepository;
 import com.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,9 @@ public class AuthServiceImpl implements AuthService {
     private final InvalidatedTokenRepository invalidatedTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+
+    @Value("${app.google.client-id:}")
+    private String googleClientId;
 
     @Override
     @Transactional
@@ -158,6 +163,104 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    @Transactional
+    public AuthResponse loginWithGoogle(GoogleLoginRequest request) {
+        String idToken = request.getIdToken();
+        String url = "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken;
+        
+        org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+        GoogleTokenInfo tokenInfo;
+        try {
+            tokenInfo = restTemplate.getForObject(url, GoogleTokenInfo.class);
+        } catch (org.springframework.web.client.RestClientException e) {
+            throw Problem.builder()
+                    .withType(URI.create("https://api.app.com/errors/invalid-google-token"))
+                    .withTitle("Token Google Tidak Valid")
+                    .withStatus(Status.UNAUTHORIZED)
+                    .withDetail("Gagal memverifikasi token Google: " + e.getMessage())
+                    .build();
+        }
+
+        if (tokenInfo == null || tokenInfo.getEmail() == null) {
+            throw Problem.builder()
+                    .withType(URI.create("https://api.app.com/errors/invalid-google-token"))
+                    .withTitle("Token Google Tidak Valid")
+                    .withStatus(Status.UNAUTHORIZED)
+                    .withDetail("Token Google tidak berisi informasi email pengguna.")
+                    .build();
+        }
+
+        // Validasi issuer
+        if (tokenInfo.getIss() == null || 
+                (!tokenInfo.getIss().equals("https://accounts.google.com") && !tokenInfo.getIss().equals("accounts.google.com"))) {
+            throw Problem.builder()
+                    .withType(URI.create("https://api.app.com/errors/invalid-google-token"))
+                    .withTitle("Token Google Tidak Valid")
+                    .withStatus(Status.UNAUTHORIZED)
+                    .withDetail("Issuer token Google tidak valid.")
+                    .build();
+        }
+
+        // Validasi audience (client ID) jika dikonfigurasi dan bukan nilai default
+        if (googleClientId != null && !googleClientId.isEmpty() && !googleClientId.equals("mock-google-client-id")) {
+            if (!googleClientId.equals(tokenInfo.getAud())) {
+                throw Problem.builder()
+                        .withType(URI.create("https://api.app.com/errors/invalid-google-token"))
+                        .withTitle("Token Google Tidak Valid")
+                        .withStatus(Status.UNAUTHORIZED)
+                        .withDetail("Audience token Google tidak cocok dengan Client ID aplikasi.")
+                        .build();
+            }
+        }
+
+        String email = tokenInfo.getEmail();
+        Optional<UserEntity> userOpt = userRepository.findByEmail(email);
+        UserEntity user;
+
+        if (userOpt.isEmpty()) {
+            // Register new user
+            // Buat username dari email prefix
+            String baseUsername = email.split("@")[0];
+            String username = baseUsername;
+            int suffix = 1;
+            while (userRepository.existsByUsername(username)) {
+                username = baseUsername + "_" + suffix;
+                suffix++;
+            }
+
+            user = UserEntity.builder()
+                    .username(username)
+                    .email(email)
+                    .fullName(tokenInfo.getName() != null ? tokenInfo.getName() : baseUsername)
+                    .password(passwordEncoder.encode(java.util.UUID.randomUUID().toString()))
+                    .role("ROLE_USER")
+                    .active(true)
+                    .build();
+
+            user = userRepository.save(user);
+        } else {
+            user = userOpt.get();
+            if (!user.isActive()) {
+                throw Problem.builder()
+                        .withType(URI.create("https://api.app.com/errors/user-disabled"))
+                        .withTitle("Akun Dinonaktifkan")
+                        .withStatus(Status.FORBIDDEN)
+                        .withDetail("Akun pengguna ini telah dinonaktifkan.")
+                        .build();
+            }
+        }
+
+        String token = jwtService.generateToken(user.getUsername(), user.getRole());
+
+        return AuthResponse.builder()
+                .token(token)
+                .tokenType("Bearer")
+                .expiresIn(jwtService.getExpirationInSeconds())
+                .user(mapToUserResponse(user))
+                .build();
+    }
+
     private UserResponse mapToUserResponse(UserEntity entity) {
         return UserResponse.builder()
                 .id(entity.getId())
@@ -167,5 +270,16 @@ public class AuthServiceImpl implements AuthService {
                 .role(entity.getRole())
                 .active(entity.isActive())
                 .build();
+    }
+
+    @lombok.Data
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+    private static class GoogleTokenInfo {
+        private String iss;
+        private String sub;
+        private String aud;
+        private String email;
+        private String name;
+        private String picture;
     }
 }

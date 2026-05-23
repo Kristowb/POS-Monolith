@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/authStore';
 import type { LoginRequest, RegisterRequest } from '../types';
@@ -41,13 +41,42 @@ const toggleTheme = () => {
   themeMode.value = themeMode.value === 'dark' ? 'light' : 'dark';
 };
 
-// Tampilkan Toast Google Mockup
-const triggerGoogleMockup = () => {
-  googleToastMsg.value = "Fitur masuk via Google akan segera hadir! Silakan gunakan formulir biasa untuk saat ini.";
-  showGoogleToast.value = true;
-  setTimeout(() => {
-    showGoogleToast.value = false;
-  }, 4000);
+onMounted(() => {
+  renderGoogleButton();
+});
+
+const renderGoogleButton = () => {
+  const google = (window as any).google;
+  if (google) {
+    google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'your-google-client-id.apps.googleusercontent.com',
+      callback: handleGoogleLoginCallback
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById('google-signin-btn'),
+      { 
+        theme: 'filled_black', 
+        size: 'large', 
+        width: 384, 
+        logo_alignment: 'left',
+        text: 'continue_with'
+      }
+    );
+  } else {
+    setTimeout(renderGoogleButton, 500);
+  }
+};
+
+const handleGoogleLoginCallback = async (response: any) => {
+  const idToken = response.credential;
+  authStore.value.clearError();
+  try {
+    await authStore.value.loginWithGoogle(idToken);
+    router.push('/');
+  } catch (err) {
+    console.error('Google login failed:', err);
+  }
 };
 
 // Submit handler
@@ -159,21 +188,10 @@ const handleSubmit = async () => {
           </button>
         </div>
 
-        <!-- Google Auth Button -->
-        <button 
-          type="button"
-          @click="triggerGoogleMockup"
-          class="w-full bg-[#111726] border border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700/80 text-white rounded-xl py-3 px-4 text-xs font-semibold flex items-center justify-center gap-2.5 transition-all duration-200"
-        >
-          <!-- Google Icon Multi-color -->
-          <svg class="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-.14 2.7-.01 3.5l-3.23-2.5c2.05-1.4 3.23-3.5 3.23-6.22z"/>
-            <path fill="#34A853" d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-3.23-2.5c-.9.6-2.05.96-3.23.96-3.11 0-5.74-2.1-6.68-4.92H1.4v2.54C3.39 21.02 7.39 24 12 24z"/>
-            <path fill="#FBBC05" d="M5.32 15.03c-.24-.7-.38-1.4-.38-2.13s.14-1.43.38-2.13V8.23H1.4a11.96 11.96 0 000 7.54l3.92-3.08v2.34z"/>
-            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.22 0 12 0 7.39 0 3.39 2.98 1.4 6.97l3.92 3.08c.94-2.82 3.57-4.92 6.68-4.92z"/>
-          </svg>
-          {{ authMode === 'signup' ? 'Continue with Google' : 'Login with Google' }}
-        </button>
+        <!-- Google Auth Button (Official GSI Button) -->
+        <div class="w-full flex justify-center mb-4">
+          <div id="google-signin-btn"></div>
+        </div>
 
         <!-- Divider -->
         <div class="relative flex items-center my-6">

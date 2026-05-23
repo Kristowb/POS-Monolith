@@ -30,3 +30,10 @@ frontend/pnpm-debug.log*
 *.log
 tmp/
 temp/
+
+# Secrets and environment configurations
+ClientSecretGoogleOAuth.json
+frontend/.env
+frontend/.env.*
+.env
+.env.*

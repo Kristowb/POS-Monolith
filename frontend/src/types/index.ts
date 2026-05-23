@@ -1,7 +1,7 @@
 // Impor tipe data yang di-generate otomatis dari DTO Java
-import type { HealthCheckDto, UserRequest, UserResponse, AuthResponse, LoginRequest, RegisterRequest } from './backend-models';
+import type { HealthCheckDto, UserRequest, UserResponse, AuthResponse, LoginRequest, RegisterRequest, GoogleLoginRequest } from './backend-models';
 
-export type { HealthCheckDto, UserRequest, UserResponse, AuthResponse, LoginRequest, RegisterRequest };
+export type { HealthCheckDto, UserRequest, UserResponse, AuthResponse, LoginRequest, RegisterRequest, GoogleLoginRequest };
 
 // RFC 7807 Problem Details interface (untuk penanganan error global)
 export interface ProblemDetail {

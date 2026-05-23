@@ -35,3 +35,7 @@ logging:
   level:
     org.springframework.web: INFO
     org.hibernate.SQL: DEBUG
+
+app:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:388384106777-9v38gpdj493b0m28h58nia0o9iau5oss.apps.googleusercontent.com}

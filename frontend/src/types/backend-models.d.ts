@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-05-23 09:24:13.
+// Generated using typescript-generator version 3.2.1263 on 2026-05-23 21:48:09.
 
 export interface AuthResponse {
     token: string;
@@ -10,6 +10,13 @@ export interface AuthResponse {
 }
 
 export interface AuthResponseBuilder {
+}
+
+export interface GoogleLoginRequest {
+    idToken: string;
+}
+
+export interface GoogleLoginRequestBuilder {
 }
 
 export interface HealthCheckDto {

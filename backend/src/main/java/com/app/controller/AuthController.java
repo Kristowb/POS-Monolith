@@ -1,6 +1,7 @@
 package com.app.controller;
 
 import com.app.dto.AuthResponse;
+import com.app.dto.GoogleLoginRequest;
 import com.app.dto.LoginRequest;
 import com.app.dto.RegisterRequest;
 import com.app.service.AuthService;
@@ -26,6 +27,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> loginWithGoogle(@Valid @RequestBody GoogleLoginRequest request) {
+        AuthResponse response = authService.loginWithGoogle(request);
         return ResponseEntity.ok(response);
     }
 
