@@ -40,4 +40,23 @@ d:\Code\AI\POS Monolith/
 
 ---
 
+## Infrastruktur & Deployment (Production)
+
+Monorepo ini dikonfigurasi untuk terdeploy secara otomatis menggunakan **GitHub Actions**:
+1. **Frontend (Vue 3)**:
+   * **Hosting**: GitHub Pages
+   * **URL Akses**: [https://Kristowb.github.io/POS-Monolith/](https://Kristowb.github.io/POS-Monolith/)
+   * **CI/CD**: Otomatis di-build dan di-deploy ke branch `gh-pages` oleh GitHub Actions setiap kali ada push ke `master`.
+2. **Backend (Spring Boot 3)**:
+   * **Hosting**: Railway
+   * **URL API**: [https://striking-charisma-staging.up.railway.app/api/v1](https://striking-charisma-staging.up.railway.app/api/v1)
+   * **API Docs**: Swagger UI aktif di [https://striking-charisma-staging.up.railway.app/swagger-ui/index.html](https://striking-charisma-staging.up.railway.app/swagger-ui/index.html)
+   * **CI/CD**: Deploy otomatis via integrasi Railway dengan membaca konfigurasi `railway.json`.
+3. **Database**:
+   * **Hosting**: Supabase (PostgreSQL)
+   * **Koneksi**: Menggunakan *Session Connection Pooler* (IPv4 compatible) untuk mendukung stabilitas koneksi dari Railway.
+   * **DDL**: Otomatis digenerate oleh Hibernate (`ddl-auto: update`) saat aplikasi backend pertama kali berjalan.
+
+---
+
 *Catatan untuk AI Assistant*: Sesi awal penyiapan arsitektur ini terdokumentasi di berkas [walkthrough.md](file:///C:/Users/User/.gemini/antigravity/brain/abe5e70b-11d6-496f-a9cd-6a2cd97fdc72/walkthrough.md) dalam AppData Antigravity.
