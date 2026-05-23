@@ -27,8 +27,20 @@ public class UserEntity {
     @Column(nullable = false)
     private String fullName;
 
-    @Column(nullable = false)
-    private String role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @Builder.Default
+    private java.util.Set<RoleEntity> roles = new java.util.HashSet<>();
+
+    @Builder.Default
+    private int level = 1;
+
+    @Builder.Default
+    private int experience = 0;
 
     @Column(nullable = false)
     private String password;

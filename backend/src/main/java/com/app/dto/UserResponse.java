@@ -15,5 +15,8 @@ public class UserResponse {
     private String email;
     private String fullName;
     private String role;
+    private java.util.Set<String> roles;
+    private int level;
+    private int experience;
     private boolean active;
 }

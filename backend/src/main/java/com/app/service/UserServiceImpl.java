@@ -2,7 +2,9 @@ package com.app.service;
 
 import com.app.dto.UserRequest;
 import com.app.dto.UserResponse;
+import com.app.model.RoleEntity;
 import com.app.model.UserEntity;
+import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -69,11 +72,22 @@ public class UserServiceImpl implements UserService {
             rawPassword = "password123";
         }
 
+        RoleEntity userRole = roleRepository.findByCode(request.getRole())
+                .orElseGet(() -> roleRepository.findByCode("ROLE_KNIGHT")
+                        .orElseThrow(() -> Problem.builder()
+                                .withType(URI.create("https://api.app.com/errors/role-not-found"))
+                                .withTitle("Role Tidak Ditemukan")
+                                .withStatus(Status.INTERNAL_SERVER_ERROR)
+                                .withDetail("Role default ROLE_KNIGHT tidak ditemukan di database.")
+                                .build()));
+
         UserEntity user = UserEntity.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .fullName(request.getFullName())
-                .role(request.getRole())
+                .roles(java.util.Set.of(userRole))
+                .level(1)
+                .experience(0)
                 .password(passwordEncoder.encode(rawPassword))
                 .active(request.getActive() != null ? request.getActive() : true)
                 .build();
@@ -115,7 +129,16 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
-        user.setRole(request.getRole());
+        if (request.getRole() != null) {
+            RoleEntity userRole = roleRepository.findByCode(request.getRole())
+                    .orElseThrow(() -> Problem.builder()
+                            .withType(URI.create("https://api.app.com/errors/role-not-found"))
+                            .withTitle("Role Tidak Ditemukan")
+                            .withStatus(Status.BAD_REQUEST)
+                            .withDetail("Role '" + request.getRole() + "' tidak ditemukan.")
+                            .build());
+            user.setRoles(java.util.Set.of(userRole));
+        }
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
@@ -147,7 +170,10 @@ public class UserServiceImpl implements UserService {
                 .username(entity.getUsername())
                 .email(entity.getEmail())
                 .fullName(entity.getFullName())
-                .role(entity.getRole())
+                .role(entity.getRoles().isEmpty() ? "ROLE_USER" : entity.getRoles().iterator().next().getCode())
+                .roles(entity.getRoles().stream().map(RoleEntity::getCode).collect(Collectors.toSet()))
+                .level(entity.getLevel())
+                .experience(entity.getExperience())
                 .active(entity.isActive())
                 .build();
     }

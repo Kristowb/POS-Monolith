@@ -102,6 +102,30 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async addExperience(exp: number) {
+      try {
+        const response = await api.post<UserResponse>(`/menus/simulate-exp?exp=${exp}`);
+        const updatedUser = response.data;
+        this.currentUser = updatedUser;
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        return updatedUser;
+      } catch (err) {
+        console.error('Gagal menambahkan EXP:', err);
+      }
+    },
+
+    async simulateLevelUp() {
+      try {
+        const response = await api.post<UserResponse>('/menus/simulate-levelup');
+        const updatedUser = response.data;
+        this.currentUser = updatedUser;
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        return updatedUser;
+      } catch (err) {
+        console.error('Gagal menaikkan level:', err);
+      }
+    },
+
     async logout() {
       this.loading = true;
       this.error = null;

@@ -7,8 +7,10 @@ import com.app.dto.LoginRequest;
 import com.app.dto.RegisterRequest;
 import com.app.dto.UserResponse;
 import com.app.model.InvalidatedToken;
+import com.app.model.RoleEntity;
 import com.app.model.UserEntity;
 import com.app.repository.InvalidatedTokenRepository;
+import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final InvalidatedTokenRepository invalidatedTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RoleRepository roleRepository;
 
     @Value("${app.google.client-id:}")
     private String googleClientId;
@@ -54,18 +57,32 @@ public class AuthServiceImpl implements AuthService {
                     .build();
         }
 
+        RoleEntity userRole = roleRepository.findByCode(request.getRole())
+                .orElseGet(() -> roleRepository.findByCode("ROLE_KNIGHT")
+                        .orElseThrow(() -> Problem.builder()
+                                .withType(URI.create("https://api.app.com/errors/role-not-found"))
+                                .withTitle("Role Tidak Ditemukan")
+                                .withStatus(Status.INTERNAL_SERVER_ERROR)
+                                .withDetail("Role default ROLE_KNIGHT tidak ditemukan di database.")
+                                .build()));
+
         UserEntity user = UserEntity.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .fullName(request.getFullName())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .roles(java.util.Set.of(userRole))
+                .level(1)
+                .experience(0)
                 .active(true)
                 .build();
 
         UserEntity savedUser = userRepository.save(user);
         
-        String token = jwtService.generateToken(savedUser.getUsername(), savedUser.getRole());
+        String rolesStr = savedUser.getRoles().stream()
+                .map(RoleEntity::getCode)
+                .collect(java.util.stream.Collectors.joining(","));
+        String token = jwtService.generateToken(savedUser.getUsername(), rolesStr);
         
         return AuthResponse.builder()
                 .token(token)
@@ -116,7 +133,10 @@ public class AuthServiceImpl implements AuthService {
                     .build();
         }
 
-        String token = jwtService.generateToken(user.getUsername(), user.getRole());
+        String rolesStr = user.getRoles().stream()
+                .map(RoleEntity::getCode)
+                .collect(java.util.stream.Collectors.joining(","));
+        String token = jwtService.generateToken(user.getUsername(), rolesStr);
 
         return AuthResponse.builder()
                 .token(token)
@@ -229,12 +249,22 @@ public class AuthServiceImpl implements AuthService {
                 suffix++;
             }
 
+            RoleEntity knightRole = roleRepository.findByCode("ROLE_KNIGHT")
+                    .orElseThrow(() -> Problem.builder()
+                            .withType(URI.create("https://api.app.com/errors/role-not-found"))
+                            .withTitle("Role Tidak Ditemukan")
+                            .withStatus(Status.INTERNAL_SERVER_ERROR)
+                            .withDetail("Role default ROLE_KNIGHT tidak ditemukan di database.")
+                            .build());
+
             user = UserEntity.builder()
                     .username(username)
                     .email(email)
                     .fullName(tokenInfo.getName() != null ? tokenInfo.getName() : baseUsername)
                     .password(passwordEncoder.encode(java.util.UUID.randomUUID().toString()))
-                    .role("ROLE_USER")
+                    .roles(java.util.Set.of(knightRole))
+                    .level(1)
+                    .experience(0)
                     .active(true)
                     .build();
 
@@ -251,7 +281,10 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        String token = jwtService.generateToken(user.getUsername(), user.getRole());
+        String rolesStr = user.getRoles().stream()
+                .map(RoleEntity::getCode)
+                .collect(java.util.stream.Collectors.joining(","));
+        String token = jwtService.generateToken(user.getUsername(), rolesStr);
 
         return AuthResponse.builder()
                 .token(token)
@@ -267,7 +300,10 @@ public class AuthServiceImpl implements AuthService {
                 .username(entity.getUsername())
                 .email(entity.getEmail())
                 .fullName(entity.getFullName())
-                .role(entity.getRole())
+                .role(entity.getRoles().isEmpty() ? "ROLE_USER" : entity.getRoles().iterator().next().getCode())
+                .roles(entity.getRoles().stream().map(RoleEntity::getCode).collect(java.util.stream.Collectors.toSet()))
+                .level(entity.getLevel())
+                .experience(entity.getExperience())
                 .active(entity.isActive())
                 .build();
     }

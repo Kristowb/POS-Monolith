@@ -19,6 +19,7 @@ const form = reactive({
   username: '',
   email: '',
   password: '',
+  role: 'ROLE_KNIGHT', // default RPG Class
 });
 
 const showPassword = ref(false);
@@ -93,7 +94,7 @@ const handleSubmit = async () => {
       email: form.email,
       fullName: form.fullName,
       password: form.password,
-      role: 'ROLE_USER', // Peran default
+      role: form.role, // Dynamic RPG Class!
     };
 
     try {
@@ -237,6 +238,74 @@ const handleSubmit = async () => {
               placeholder="yourusername"
               class="w-full bg-[#111726] border border-gray-800/60 focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 text-white rounded-xl py-3 px-4 text-sm outline-none transition-all duration-200 placeholder-gray-600"
             />
+          </div>
+
+          <!-- RPG Class Selection (Sign Up Only) -->
+          <div v-if="authMode === 'signup'" class="space-y-2 mt-4">
+            <label class="block text-xs font-semibold text-gray-400">Choose Your RPG Class *</label>
+            <div class="grid grid-cols-3 gap-3">
+              <!-- Knight -->
+              <button 
+                type="button"
+                @click="form.role = 'ROLE_KNIGHT'"
+                :class="[
+                  'p-3 rounded-xl border text-center transition-all duration-200 cursor-pointer flex flex-col items-center gap-1.5',
+                  form.role === 'ROLE_KNIGHT'
+                    ? 'bg-blue-600/25 border-blue-500 text-white shadow-lg shadow-blue-500/10'
+                    : 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400'
+                ]"
+              >
+                <!-- Shield Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span class="text-[10px] font-bold">Knight</span>
+              </button>
+              
+              <!-- Archer -->
+              <button 
+                type="button"
+                @click="form.role = 'ROLE_ARCHER'"
+                :class="[
+                  'p-3 rounded-xl border text-center transition-all duration-200 cursor-pointer flex flex-col items-center gap-1.5',
+                  form.role === 'ROLE_ARCHER'
+                    ? 'bg-emerald-600/25 border-emerald-500 text-white shadow-lg shadow-emerald-500/10'
+                    : 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400'
+                ]"
+              >
+                <!-- Target/Crosshair Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-7-3a3 3 0 013 3M2.5 20.5l4-4m-4 4V15m0 5.5H8" />
+                </svg>
+                <span class="text-[10px] font-bold">Archer</span>
+              </button>
+
+              <!-- Warrior -->
+              <button 
+                type="button"
+                @click="form.role = 'ROLE_WARRIOR'"
+                :class="[
+                  'p-3 rounded-xl border text-center transition-all duration-200 cursor-pointer flex flex-col items-center gap-1.5',
+                  form.role === 'ROLE_WARRIOR'
+                    ? 'bg-amber-600/25 border-amber-500 text-white shadow-lg shadow-amber-500/10'
+                    : 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400'
+                ]"
+              >
+                <!-- Sword Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span class="text-[10px] font-bold">Warrior</span>
+              </button>
+            </div>
+            <p class="text-[10px] text-gray-500 italic mt-1 text-center">
+              {{ 
+                form.role === 'ROLE_KNIGHT' ? 'Knight: Akses menu Kasir standar.' :
+                form.role === 'ROLE_ARCHER' ? 'Archer: Akses menu Analitik Penjualan terbuka pada Level 5.' :
+                'Warrior: Akses menu Manajemen Inventaris terbuka pada Level 3.'
+              }}
+            </p>
           </div>
 
           <!-- Email (Input Utama) -->

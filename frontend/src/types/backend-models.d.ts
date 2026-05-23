@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-05-23 21:48:09.
+// Generated using typescript-generator version 3.2.1263 on 2026-05-23 23:21:51.
 
 export interface AuthResponse {
     token: string;
@@ -65,6 +65,9 @@ export interface UserResponse {
     email: string;
     fullName: string;
     role: string;
+    roles: string[];
+    level: number;
+    experience: number;
     active: boolean;
 }
 
