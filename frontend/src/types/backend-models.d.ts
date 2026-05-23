@@ -1,6 +1,16 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-05-23 08:02:13.
+// Generated using typescript-generator version 3.2.1263 on 2026-05-23 09:24:13.
+
+export interface AuthResponse {
+    token: string;
+    tokenType: string;
+    expiresIn: number;
+    user: UserResponse;
+}
+
+export interface AuthResponseBuilder {
+}
 
 export interface HealthCheckDto {
     status: string;
@@ -11,11 +21,31 @@ export interface HealthCheckDto {
 export interface HealthCheckDtoBuilder {
 }
 
+export interface LoginRequest {
+    usernameOrEmail: string;
+    password: string;
+}
+
+export interface LoginRequestBuilder {
+}
+
+export interface RegisterRequest {
+    username: string;
+    email: string;
+    fullName: string;
+    password: string;
+    role: string;
+}
+
+export interface RegisterRequestBuilder {
+}
+
 export interface UserRequest {
     username: string;
     email: string;
     fullName: string;
     role: string;
+    password: string;
     active: boolean;
 }
 

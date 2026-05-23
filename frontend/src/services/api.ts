@@ -2,11 +2,25 @@ import axios, { AxiosError } from 'axios';
 import type { ProblemDetail } from '../types';
 
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Interceptor untuk menyisipkan token JWT di setiap request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Interceptor untuk menangani error response secara konsisten berbasis RFC 7807
 api.interceptors.response.use(

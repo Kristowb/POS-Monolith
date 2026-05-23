@@ -30,6 +30,9 @@ public class UserEntity {
     @Column(nullable = false)
     private String role;
 
+    @Column(nullable = false)
+    private String password;
+
     @Builder.Default
     private boolean active = true;
 }

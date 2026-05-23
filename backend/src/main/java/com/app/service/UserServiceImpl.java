@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,11 +64,17 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
 
+        String rawPassword = request.getPassword();
+        if (rawPassword == null || rawPassword.isBlank()) {
+            rawPassword = "password123";
+        }
+
         UserEntity user = UserEntity.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .fullName(request.getFullName())
                 .role(request.getRole())
+                .password(passwordEncoder.encode(rawPassword))
                 .active(request.getActive() != null ? request.getActive() : true)
                 .build();
 
@@ -107,6 +116,9 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
         user.setRole(request.getRole());
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         if (request.getActive() != null) {
             user.setActive(request.getActive());
         }

@@ -7,6 +7,8 @@ server:
       enabled: false
 
 spring:
+  profiles:
+    active: dev
   application:
     name: backend
   
@@ -14,17 +16,13 @@ spring:
     throw-exception-if-no-handler-found: true
 
   datasource:
-    url: jdbc:h2:mem:posdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
+    url: ${DB_URL:jdbc:postgresql://db.glzbyhuwalvmgysukfbd.supabase.co:5432/postgres}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:[Celengsuper_12]}
+  
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true

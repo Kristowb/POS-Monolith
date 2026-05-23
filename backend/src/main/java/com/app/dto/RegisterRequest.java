@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRequest {
+public class RegisterRequest {
 
     @NotBlank(message = "Username tidak boleh kosong")
     @Size(min = 3, max = 50, message = "Username harus antara 3 sampai 50 karakter")
@@ -26,10 +26,10 @@ public class UserRequest {
     @Size(min = 2, max = 100, message = "Nama lengkap harus antara 2 sampai 100 karakter")
     private String fullName;
 
-    @NotBlank(message = "Role tidak boleh kosong")
-    private String role;
-
+    @NotBlank(message = "Password tidak boleh kosong")
+    @Size(min = 6, max = 100, message = "Password minimal harus 6 karakter")
     private String password;
 
-    private Boolean active;
+    @NotBlank(message = "Role tidak boleh kosong")
+    private String role;
 }
