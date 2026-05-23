@@ -1,0 +1,32 @@
+# Project exclusion rules
+
+# Java / Maven build files
+backend/target/
+backend/*.jar
+backend/*.war
+backend/*.zip
+
+# Node / Vue build files
+frontend/node_modules/
+frontend/dist/
+frontend/.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~
+.DS_Store
+
+# Temporary files
+*.log
+tmp/
+temp/
