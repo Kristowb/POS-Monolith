@@ -16,6 +16,7 @@
     <description>Backend Monorepo Spring Boot 3</description>
     <properties>
         <java.version>17</java.version>
+        <typescript-generator.skip>false</typescript-generator.skip>
     </properties>
     <dependencies>
         <dependency>
@@ -86,6 +87,12 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- Springdoc OpenAPI for Swagger UI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.5.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -116,6 +123,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <skip>${typescript-generator.skip}</skip>
                     <jsonLibrary>jackson2</jsonLibrary>
                     <classPatterns>
                         <classPattern>com.app.dto.**</classPattern>
