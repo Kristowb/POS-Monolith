@@ -17,10 +17,10 @@ spring:
     throw-exception-if-no-handler-found: true
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://db.glzbyhuwalvmgysukfbd.supabase.co:5432/postgres}
+    url: ${DB_URL:jdbc:postgresql://db.brjjgmiwzhrrzrhmcpyb.supabase.co:5432/postgres}
     driver-class-name: org.postgresql.Driver
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:[Celengsuper_12]}
+    password: ${DB_PASSWORD:Celengsuper_12}
   
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
