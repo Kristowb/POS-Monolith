@@ -1,5 +1,8 @@
 # POS Monolith Monorepo
 
+> [!TIP]
+> **Dokumentasi Visual & Interaktif**: Kami telah menyediakan berkas dokumentasi interaktif yang dilengkapi dengan simulator alur request dan diagram arsitektur hidup. Anda dapat membuka langsung berkas [README.html](file:///D:/Code/AI/POS%20Monolith/README.html) di browser Anda!
+
 Repositori ini mengadopsi arsitektur decoupled monorepo modern yang memisahkan backend API (**Spring Boot 3**) dan frontend client (**Vue 3**) dalam satu tempat kerja untuk kolaborasi yang sangat erat.
 
 ## Panduan Arsitektur & Teknologi
