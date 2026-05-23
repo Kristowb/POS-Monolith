@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2026-05-23 23:21:51.
+// Generated using typescript-generator version 3.2.1263 on 2026-05-24 00:24:31.
 
 export interface AuthResponse {
     token: string;
