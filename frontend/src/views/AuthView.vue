@@ -124,7 +124,10 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-12 min-h-screen bg-[#070b13] text-gray-100 font-sans overflow-x-hidden relative">
+  <div :class="[
+    'grid grid-cols-1 lg:grid-cols-12 min-h-screen font-sans overflow-x-hidden relative transition-colors duration-700',
+    themeMode === 'dark' ? 'bg-[#070b13] text-gray-100' : 'bg-slate-50 text-slate-800'
+  ]">
     
     <!-- Toast Notifikasi untuk Google -->
     <Transition name="fade">
@@ -137,7 +140,7 @@ const handleSubmit = async () => {
     </Transition>
 
     <!-- KIRI: FORM PANEL (5 Kolom) -->
-    <div class="lg:col-span-5 flex flex-col justify-between p-8 lg:p-12 bg-[#090d16] border-r border-gray-800/40 relative z-10">
+    <div class="lg:col-span-5 flex flex-col justify-between p-8 lg:p-12 bg-[#090d16] border-r border-gray-800/40 relative z-10 text-gray-100">
       
       <!-- Logo Atas -->
       <div class="flex items-center gap-3">
