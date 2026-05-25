@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/authStore';
 import type { LoginRequest, RegisterRequest } from '../types';
@@ -46,6 +46,10 @@ onMounted(() => {
   renderGoogleButton();
 });
 
+watch(themeMode, () => {
+  renderGoogleButton();
+});
+
 const renderGoogleButton = () => {
   const google = (window as any).google;
   if (google) {
@@ -54,10 +58,15 @@ const renderGoogleButton = () => {
       callback: handleGoogleLoginCallback
     });
 
+    const container = document.getElementById('google-signin-btn');
+    if (container) {
+      container.innerHTML = ''; // Clear previous button to prevent duplicate rendering
+    }
+
     google.accounts.id.renderButton(
       document.getElementById('google-signin-btn'),
       { 
-        theme: 'filled_black', 
+        theme: themeMode.value === 'dark' ? 'filled_black' : 'outline', 
         size: 'large', 
         width: 384, 
         logo_alignment: 'left',
@@ -140,7 +149,12 @@ const handleSubmit = async () => {
     </Transition>
 
     <!-- KIRI: FORM PANEL (5 Kolom) -->
-    <div class="lg:col-span-5 flex flex-col justify-between p-8 lg:p-12 bg-[#090d16] border-r border-gray-800/40 relative z-10 text-gray-100">
+    <div :class="[
+      'lg:col-span-5 flex flex-col justify-between p-8 lg:p-12 transition-all duration-700 relative z-10 border-r',
+      themeMode === 'dark' 
+        ? 'bg-[#090d16] border-gray-800/40 text-gray-100' 
+        : 'bg-white border-slate-200 text-slate-800'
+    ]">
       
       <!-- Logo Atas -->
       <div class="flex items-center gap-3">
@@ -150,30 +164,30 @@ const handleSubmit = async () => {
             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
           </svg>
         </div>
-        <span class="text-xl font-bold tracking-tight text-white">NovaPOS</span>
+        <span :class="['text-xl font-bold tracking-tight transition-colors duration-300', themeMode === 'dark' ? 'text-white' : 'text-slate-900']">NovaPOS</span>
       </div>
 
       <!-- Main Form Container -->
       <div class="my-auto py-8 max-w-sm w-full mx-auto">
         <div class="space-y-2 mb-8">
-          <h1 class="text-3xl font-extrabold tracking-tight text-white">
+          <h1 :class="['text-3xl font-extrabold tracking-tight transition-colors duration-300', themeMode === 'dark' ? 'text-white' : 'text-slate-900']">
             {{ authMode === 'signup' ? 'Create account' : 'Welcome back' }}
           </h1>
-          <p class="text-gray-400 text-sm">
+          <p :class="['text-sm transition-colors duration-300', themeMode === 'dark' ? 'text-gray-400' : 'text-slate-500']">
             {{ authMode === 'signup' ? 'Start your free 14-day trial' : 'Please log in to manage your system' }}
           </p>
         </div>
 
         <!-- Tab Switcher -->
-        <div class="bg-[#111726] p-1 rounded-xl flex gap-1 mb-6 border border-gray-800/30">
+        <div :class="['p-1 rounded-xl flex gap-1 mb-6 border transition-all duration-300', themeMode === 'dark' ? 'bg-[#111726] border-gray-800/30' : 'bg-slate-100 border-slate-200']">
           <button 
             type="button"
             @click="setMode('signin')" 
             :class="[
               'flex-1 text-center py-2.5 text-xs font-semibold rounded-lg transition-all duration-300',
               authMode === 'signin' 
-                ? 'bg-[#18233c] text-white shadow-md' 
-                : 'text-gray-400 hover:text-gray-200'
+                ? (themeMode === 'dark' ? 'bg-[#18233c] text-white shadow-md' : 'bg-white text-slate-800 shadow-sm') 
+                : (themeMode === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-slate-500 hover:text-slate-700')
             ]"
           >
             Sign in
@@ -184,8 +198,8 @@ const handleSubmit = async () => {
             :class="[
               'flex-1 text-center py-2.5 text-xs font-semibold rounded-lg transition-all duration-300',
               authMode === 'signup' 
-                ? 'bg-[#18233c] text-white shadow-md' 
-                : 'text-gray-400 hover:text-gray-200'
+                ? (themeMode === 'dark' ? 'bg-[#18233c] text-white shadow-md' : 'bg-white text-slate-800 shadow-sm') 
+                : (themeMode === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-slate-500 hover:text-slate-700')
             ]"
           >
             Sign up
@@ -199,20 +213,20 @@ const handleSubmit = async () => {
 
         <!-- Divider -->
         <div class="relative flex items-center my-6">
-          <div class="flex-grow border-t border-gray-800/60"></div>
-          <span class="flex-shrink mx-4 text-gray-500 text-xs font-semibold uppercase tracking-wider">or</span>
-          <div class="flex-grow border-t border-gray-800/60"></div>
+          <div :class="['flex-grow border-t transition-colors duration-300', themeMode === 'dark' ? 'border-gray-800/60' : 'border-slate-200']"></div>
+          <span :class="['flex-shrink mx-4 text-xs font-semibold uppercase tracking-wider transition-colors duration-300', themeMode === 'dark' ? 'text-gray-500' : 'text-slate-400']">or</span>
+          <div :class="['flex-grow border-t transition-colors duration-300', themeMode === 'dark' ? 'border-gray-800/60' : 'border-slate-200']"></div>
         </div>
 
         <!-- REST API Alert Error (RFC 7807) -->
-        <div v-if="authStore.error" class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-5 text-sm">
-          <div class="flex items-start gap-2.5 text-red-400">
+        <div v-if="authStore.error" :class="['border rounded-xl p-4 mb-5 text-sm transition-all duration-300', themeMode === 'dark' ? 'bg-red-500/10 border-red-500/30' : 'bg-red-50 border-red-200']">
+          <div :class="['flex items-start gap-2.5', themeMode === 'dark' ? 'text-red-400' : 'text-red-600']">
             <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
             </svg>
             <div>
-              <p class="font-bold text-red-300">{{ authStore.error.title || 'Gagal' }}</p>
-              <p class="text-xs text-red-200 mt-1">{{ authStore.error.detail || 'Terjadi kesalahan sistem.' }}</p>
+              <p :class="['font-bold', themeMode === 'dark' ? 'text-red-300' : 'text-red-800']">{{ authStore.error.title || 'Gagal' }}</p>
+              <p :class="['text-xs mt-1', themeMode === 'dark' ? 'text-red-200' : 'text-red-700']">{{ authStore.error.detail || 'Terjadi kesalahan sistem.' }}</p>
             </div>
           </div>
         </div>
@@ -221,41 +235,51 @@ const handleSubmit = async () => {
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <!-- Full Name (Register Only) -->
           <div v-if="authMode === 'signup'" class="space-y-1">
-            <label class="block text-xs font-semibold text-gray-400">Full Name *</label>
+            <label :class="['block text-xs font-semibold transition-colors duration-300', themeMode === 'dark' ? 'text-gray-400' : 'text-slate-600']">Full Name *</label>
             <input 
               v-model="form.fullName"
               type="text" 
               required
               placeholder="Your full name"
-              class="w-full bg-[#111726] border border-gray-800/60 focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 text-white rounded-xl py-3 px-4 text-sm outline-none transition-all duration-200 placeholder-gray-600"
+              :class="[
+                'w-full border focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 rounded-xl py-3 px-4 text-sm outline-none transition-all duration-300',
+                themeMode === 'dark' 
+                  ? 'bg-[#111726] border-gray-800/60 text-white placeholder-gray-600' 
+                  : 'bg-white border-slate-300 text-slate-800 placeholder-slate-400'
+              ]"
             />
           </div>
 
           <!-- Username (Register Only) -->
           <div v-if="authMode === 'signup'" class="space-y-1">
-            <label class="block text-xs font-semibold text-gray-400">Username *</label>
+            <label :class="['block text-xs font-semibold transition-colors duration-300', themeMode === 'dark' ? 'text-gray-400' : 'text-slate-600']">Username *</label>
             <input 
               v-model="form.username"
               type="text" 
               required
               placeholder="yourusername"
-              class="w-full bg-[#111726] border border-gray-800/60 focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 text-white rounded-xl py-3 px-4 text-sm outline-none transition-all duration-200 placeholder-gray-600"
+              :class="[
+                'w-full border focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 rounded-xl py-3 px-4 text-sm outline-none transition-all duration-300',
+                themeMode === 'dark' 
+                  ? 'bg-[#111726] border-gray-800/60 text-white placeholder-gray-600' 
+                  : 'bg-white border-slate-300 text-slate-800 placeholder-slate-400'
+              ]"
             />
           </div>
 
           <!-- RPG Class Selection (Sign Up Only) -->
           <div v-if="authMode === 'signup'" class="space-y-2 mt-4">
-            <label class="block text-xs font-semibold text-gray-400">Choose Your RPG Class *</label>
+            <label :class="['block text-xs font-semibold transition-colors duration-300', themeMode === 'dark' ? 'text-gray-400' : 'text-slate-600']">Choose Your RPG Class *</label>
             <div class="grid grid-cols-3 gap-3">
               <!-- Knight -->
               <button 
                 type="button"
                 @click="form.role = 'ROLE_KNIGHT'"
                 :class="[
-                  'p-3 rounded-xl border text-center transition-all duration-200 cursor-pointer flex flex-col items-center gap-1.5',
+                  'p-3 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center gap-1.5',
                   form.role === 'ROLE_KNIGHT'
-                    ? 'bg-blue-600/25 border-blue-500 text-white shadow-lg shadow-blue-500/10'
-                    : 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400'
+                    ? (themeMode === 'dark' ? 'bg-blue-600/25 border-blue-500 text-white shadow-lg shadow-blue-500/10' : 'bg-blue-50 border-blue-500 text-blue-700 shadow-md shadow-blue-500/5')
+                    : (themeMode === 'dark' ? 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400' : 'bg-white border-slate-300 hover:bg-slate-50 hover:border-slate-400 text-slate-600')
                 ]"
               >
                 <!-- Shield Icon -->
@@ -270,10 +294,10 @@ const handleSubmit = async () => {
                 type="button"
                 @click="form.role = 'ROLE_ARCHER'"
                 :class="[
-                  'p-3 rounded-xl border text-center transition-all duration-200 cursor-pointer flex flex-col items-center gap-1.5',
+                  'p-3 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center gap-1.5',
                   form.role === 'ROLE_ARCHER'
-                    ? 'bg-emerald-600/25 border-emerald-500 text-white shadow-lg shadow-emerald-500/10'
-                    : 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400'
+                    ? (themeMode === 'dark' ? 'bg-emerald-600/25 border-emerald-500 text-white shadow-lg shadow-emerald-500/10' : 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-md shadow-emerald-500/5')
+                    : (themeMode === 'dark' ? 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400' : 'bg-white border-slate-300 hover:bg-slate-50 hover:border-slate-400 text-slate-600')
                 ]"
               >
                 <!-- Target/Crosshair Icon -->
@@ -288,10 +312,10 @@ const handleSubmit = async () => {
                 type="button"
                 @click="form.role = 'ROLE_WARRIOR'"
                 :class="[
-                  'p-3 rounded-xl border text-center transition-all duration-200 cursor-pointer flex flex-col items-center gap-1.5',
+                  'p-3 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center gap-1.5',
                   form.role === 'ROLE_WARRIOR'
-                    ? 'bg-amber-600/25 border-amber-500 text-white shadow-lg shadow-amber-500/10'
-                    : 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400'
+                    ? (themeMode === 'dark' ? 'bg-amber-600/25 border-amber-500 text-white shadow-lg shadow-amber-500/10' : 'bg-amber-50 border-amber-500 text-amber-700 shadow-md shadow-amber-500/5')
+                    : (themeMode === 'dark' ? 'bg-[#111726] border-gray-800/60 hover:bg-[#151c2e] hover:border-gray-700 text-gray-400' : 'bg-white border-slate-300 hover:bg-slate-50 hover:border-slate-400 text-slate-600')
                 ]"
               >
                 <!-- Sword Icon -->
@@ -302,7 +326,7 @@ const handleSubmit = async () => {
                 <span class="text-[10px] font-bold">Warrior</span>
               </button>
             </div>
-            <p class="text-[10px] text-gray-500 italic mt-1 text-center">
+            <p :class="['text-[10px] italic mt-1 text-center transition-colors duration-300', themeMode === 'dark' ? 'text-gray-500' : 'text-slate-500']">
               {{ 
                 form.role === 'ROLE_KNIGHT' ? 'Knight: Akses menu Kasir standar.' :
                 form.role === 'ROLE_ARCHER' ? 'Archer: Akses menu Analitik Penjualan terbuka pada Level 5.' :
@@ -313,7 +337,7 @@ const handleSubmit = async () => {
 
           <!-- Email (Input Utama) -->
           <div class="space-y-1">
-            <label class="block text-xs font-semibold text-gray-400">
+            <label :class="['block text-xs font-semibold transition-colors duration-300', themeMode === 'dark' ? 'text-gray-400' : 'text-slate-600']">
               {{ authMode === 'signup' ? 'Email *' : 'Email atau Username *' }}
             </label>
             <input 
@@ -321,26 +345,36 @@ const handleSubmit = async () => {
               :type="authMode === 'signup' ? 'email' : 'text'"
               required
               :placeholder="authMode === 'signup' ? 'you@company.com' : 'you@company.com / username'"
-              class="w-full bg-[#111726] border border-gray-800/60 focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 text-white rounded-xl py-3 px-4 text-sm outline-none transition-all duration-200 placeholder-gray-600"
+              :class="[
+                'w-full border focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 rounded-xl py-3 px-4 text-sm outline-none transition-all duration-300',
+                themeMode === 'dark' 
+                  ? 'bg-[#111726] border-gray-800/60 text-white placeholder-gray-600' 
+                  : 'bg-white border-slate-300 text-slate-800 placeholder-slate-400'
+              ]"
             />
           </div>
 
           <!-- Password -->
           <div class="space-y-1">
-            <label class="block text-xs font-semibold text-gray-400">Password *</label>
+            <label :class="['block text-xs font-semibold transition-colors duration-300', themeMode === 'dark' ? 'text-gray-400' : 'text-slate-600']">Password *</label>
             <div class="relative">
               <input 
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'" 
                 required
                 placeholder="••••••••"
-                class="w-full bg-[#111726] border border-gray-800/60 focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 text-white rounded-xl py-3 px-4 pr-11 text-sm outline-none transition-all duration-200 placeholder-gray-600"
+                :class="[
+                  'w-full border focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 rounded-xl py-3 px-4 pr-11 text-sm outline-none transition-all duration-300',
+                  themeMode === 'dark' 
+                    ? 'bg-[#111726] border-gray-800/60 text-white placeholder-gray-600' 
+                    : 'bg-white border-slate-300 text-slate-800 placeholder-slate-400'
+                ]"
               />
               <!-- Toggle Password Eye Icon -->
               <button 
                 type="button"
                 @click="togglePasswordVisibility"
-                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                :class="['absolute right-4 top-1/2 -translate-y-1/2 transition-colors duration-300', themeMode === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-slate-400 hover:text-slate-600']"
               >
                 <!-- Eye Open -->
                 <svg v-if="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,7 +408,7 @@ const handleSubmit = async () => {
         </form>
 
         <!-- Toggle Switch di bawah tombol -->
-        <p class="text-center text-xs text-gray-500 mt-6">
+        <p :class="['text-center text-xs mt-6 transition-colors duration-300', themeMode === 'dark' ? 'text-gray-500' : 'text-slate-500']">
           {{ authMode === 'signup' ? 'Already have an account?' : "Don't have an account?" }}
           <button 
             @click="setMode(authMode === 'signup' ? 'signin' : 'signup')" 
@@ -386,10 +420,10 @@ const handleSubmit = async () => {
       </div>
 
       <!-- Footer Policy -->
-      <div class="text-[10px] text-gray-600 leading-relaxed text-center lg:text-left mt-8">
+      <div :class="['text-[10px] leading-relaxed text-center lg:text-left mt-8 transition-colors duration-300', themeMode === 'dark' ? 'text-gray-600' : 'text-slate-400']">
         By continuing, you agree to our 
-        <a href="#" class="underline hover:text-gray-400">Terms of Service</a> and 
-        <a href="#" class="underline hover:text-gray-400">Privacy Policy</a>.
+        <a href="#" :class="['underline transition-colors duration-300', themeMode === 'dark' ? 'hover:text-gray-400 text-blue-500' : 'hover:text-slate-600 text-blue-600']">Terms of Service</a> and 
+        <a href="#" :class="['underline transition-colors duration-300', themeMode === 'dark' ? 'hover:text-gray-400 text-blue-500' : 'hover:text-slate-600 text-blue-600']">Privacy Policy</a>.
       </div>
     </div>
 
