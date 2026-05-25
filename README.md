@@ -63,3 +63,5 @@ Monorepo ini dikonfigurasi untuk terdeploy secara otomatis menggunakan **GitHub 
 ---
 
 *Catatan untuk AI Assistant*: Sesi awal penyiapan arsitektur ini terdokumentasi di berkas [walkthrough.md](file:///C:/Users/User/.gemini/antigravity/brain/abe5e70b-11d6-496f-a9cd-6a2cd97fdc72/walkthrough.md) dalam AppData Antigravity.
+
+*Sambungan MCP*: Sambungan server MCP ke GitHub Kristowb diverifikasi pada 25 Mei 2026.
